@@ -22,7 +22,7 @@ def extract_energies(abst):
     return gevs + tevs
 
 
-ENERGY_BLACKLIST = [7000.0, 8000.0, 7500.0, 13000.0, 14000.0, 13500.0, 100000.0, 750.0, 125.0, 126.0, 125.5]
+ENERGY_BLACKLIST = [7000.0, 8000.0, 7500.0, 13000.0, 14000.0, 13500.0, 100000.0, 750.0, 125.0, 126.0, 125.5, 27000.0, 28000.0, 33000.0, 27500.0]
 LEP_ENERGY = 200
 def filter_energy(e):
     return 2 * e > LEP_ENERGY and all(be != e for be in ENERGY_BLACKLIST)
