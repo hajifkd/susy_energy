@@ -1,11 +1,20 @@
 from pyquery import PyQuery as pq
 import re
+import json
+import matplotlib.pyplot as plt
 
 QUERY_URL = 'https://arxiv.org/search/advanced?advanced=&terms-0-term=SUSY&terms-0-operator=AND&terms-0-field=all&classification-physics=y&classification-physics_archives=hep-ph&date-filter_by=specific_year&date-year=%d&abstracts=show&size=200'
 
 def get_absts(year):
-    d = pq(url=QUERY_URL % year)
-    absts = [pq(el).text() for el in d('span.abstract-full')]
+    filename = 'data/%d.json' % year
+    try:
+        with open(filename, 'r') as f:
+            absts = json.load(f)
+    except:
+        with open(filename, 'w') as f:
+            d = pq(url=QUERY_URL % year)
+            absts = [pq(el).text() for el in d('span.abstract-full')]
+            json.dump(absts, f)
     return absts
 
 def take_avg(ns):
@@ -43,8 +52,15 @@ def energy_avg(year):
     return e
 
 def main():
-    eas = [energy_avg(y) for y in range(1992, 2019)]
-    print(eas)
+    ys = list(range(1992, 2019))
+    eas = [energy_avg(y) for y in ys]
+    plt.scatter(ys, eas)
+    plt.yscale('log')
+    plt.xlabel("Year", fontsize=15)
+    plt.ylabel("Energy (GeV)", fontsize=15)
+    plt.xticks(fontsize=13)
+    plt.yticks(fontsize=13)
+    plt.show()
 
 
 if __name__ == '__main__':
