@@ -1,7 +1,9 @@
 from pyquery import PyQuery as pq
 import re
 import json
+import math
 import matplotlib.pyplot as plt
+import concurrent.futures
 
 QUERY_URL = 'https://arxiv.org/search/advanced?advanced=&terms-0-term=SUSY&terms-0-operator=AND&terms-0-field=all&classification-physics=y&classification-physics_archives=hep-ph&date-filter_by=specific_year&date-year=%d&abstracts=show&size=200'
 
@@ -45,15 +47,17 @@ def energies(year):
     return efss
 
 
-def energy_avg(year):
+def energy_avg_log(year):
+    print("Processing papers in %d" % year)
     ess = energies(year)
     es = sum(ess, [])
-    e = sum(es) / len(es)
-    return e
+    loge = sum(math.log(e) for e in es) / len(es)
+    return math.exp(loge)
 
 def main():
-    ys = list(range(1992, 2019))
-    eas = [energy_avg(y) for y in ys]
+    ys = list(range(1992, 2020))
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+    	eas = list(executor.map(energy_avg_log, ys))
     plt.scatter(ys, eas)
     plt.yscale('log')
     plt.xlabel("Year", fontsize=15)
